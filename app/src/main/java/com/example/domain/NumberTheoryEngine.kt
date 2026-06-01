@@ -1,163 +1,352 @@
 package com.example.domain
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix
+import org.apache.commons.math3.linear.ArrayRealVector
+import org.apache.commons.math3.linear.SingularValueDecomposition
+import java.lang.Math
 import java.math.BigInteger
-
-val A1_MATRIX = arrayOf(
-    intArrayOf(7, 286, 200, 176, 120, 165),
-    intArrayOf(206, 75, 129, 109, 123, 111),
-    intArrayOf(43, 52, 99, 128, 111, 110),
-    intArrayOf(98, 135, 112, 78, 118, 64),
-    intArrayOf(77, 227, 93, 88, 69, 60),
-    intArrayOf(34, 30, 73, 54, 45, 83),
-    intArrayOf(182, 88, 75, 85, 54, 53),
-    intArrayOf(89, 59, 37, 35, 38, 29),
-    intArrayOf(18, 45, 60, 49, 62, 55),
-    intArrayOf(78, 96, 29, 22, 24, 13),
-    intArrayOf(14, 11, 11, 18, 12, 12),
-    intArrayOf(30, 52, 52, 44, 28, 28),
-    intArrayOf(20, 56, 40, 31, 50, 40),
-    intArrayOf(46, 42, 29, 19, 36, 25),
-    intArrayOf(22, 17, 19, 26, 30, 20),
-    intArrayOf(15, 21, 11, 8, 8, 19),
-    intArrayOf(5, 8, 8, 11, 11, 8),
-    intArrayOf(3, 9, 5, 4, 7, 3),
-    intArrayOf(6, 3, 5, 4, 5, 6)
-)
-
-val Q_PRIMES = intArrayOf(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67)
-
-val LAMBDA_MAX = 754.648919926725
-
-val A1_PINV = arrayOf(
-    doubleArrayOf(-0.0015934991936665881, 0.002086049080837654, -0.0013824575488129308, -0.0014505177311011875, 5.356425391920567E-4, 0.0010566919090486, 0.0025502307652345607, 0.0013952607759202468, -8.070229973598489E-4, 0.0014994804444421789, 4.251813329592542E-5, -6.830969241766431E-4, -8.831155917665777E-5, 5.974851591079059E-4, -1.9641042166303562E-4, 9.327485241498302E-4, -1.6248337351699272E-4, -1.2356531763136946E-4, 1.3200140658008468E-4),
-    doubleArrayOf(2.3075567245427035E-4, -0.0017925230240246571, -7.485415478665153E-4, -0.0015821343800046213, 0.004289981659876687, -2.7827127688634444E-4, -0.0011060607598412664, 0.0015478172907088567, -2.522485376445376E-4, 0.00291525288097359, 9.838115232743165E-5, -0.003165328236317699, 0.002352691410999591, 0.001683335394606623, 5.201804620946202E-4, 0.0020209764473099567, 1.0207355165744985E-4, 1.562278656730351E-4, 1.7819989632333435E-4),
-    doubleArrayOf(0.0067767880915699, 0.004749841126355755, -0.013187985428224157, 0.012339801843628937, -0.01007058130392015, 0.0017794269838020509, 0.001728287952148016, -0.005763848087886886, 1.0062358222312734E-4, -0.006404758982046293, -0.002815932060376941, 0.014730479590047451, -0.00884229102293797, -0.005056654492055931, -0.005694084407781042, -0.007300526064551751, -0.0017853895521998354, -4.607908674212712E-4, -8.243412981992265E-4),
-    doubleArrayOf(4.903788553758743E-4, -0.004699447496391508, 0.012304774358115993, -0.00389188717146358, 0.0018035435722677203, -0.0092062107662821, 0.008597612303858113, -0.001205880264241947, -0.0029618707717222353, -0.0028080337658982915, 0.0028259182099454228, 0.0044873588652334494, -0.005596265601996878, -0.0052632796044401395, 0.0023953592571732962, -0.004541339968460831, 0.0012928063816719192, -1.4848662587238306E-4, -7.923537841392917E-4),
-    doubleArrayOf(-0.005497523966652138, -8.401086232846389E-4, 0.005618873266591819, 0.007393448209679775, 0.001935272167538382, -0.0045563651515656885, -0.006492828593564881, 8.649714741835499E-4, 0.003685816352731418, 8.079200605110934E-4, 3.049062622575866E-4, -0.004197369270972058, 0.005725689775993595, 0.0032949431331700243, 0.003241042765584913, 1.3002516559527466E-4, 0.0010642616508959673, 9.373587855096685E-4, 1.3506983923529208E-4),
-    doubleArrayOf(-1.4037851716860138E-4, 0.0024298918028873443, 4.420281161422457E-4, -0.013290976341195963, 0.002721821492460519, 0.012716666358538183, -0.004880554926234484, 0.004457491422071553, 0.0012147174824480302, 0.004881005732588208, -1.9712718550200315E-5, -0.012980718252781914, 0.00836909622868105, 0.006045291614269044, 7.488071516595233E-4, 0.010133413463004386, -2.0807171647724602E-4, -2.6526964212159987E-4, 0.0014234654639032449)
-)
+import java.security.SecureRandom
+import kotlin.math.abs
+import kotlin.math.exp
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 object NumberTheoryEngine {
+    private val TWO = BigInteger.valueOf(2L)
+    private val BASE_PRIMES = listOf(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67).map { BigInteger.valueOf(it.toLong()) }
+    
+    // SVD constants from A1 seed matrix
+    private val sigmaBase = doubleArrayOf(
+        588.66723048, 199.11266205, 128.24357738, 77.01284206, 61.64964687, 24.3807535
+    )
 
-    fun isPrime(n: BigInteger): Boolean {
-        if (n <= BigInteger.ONE) return false
-        if (n == BigInteger.TWO) return true
-        if (n.remainder(BigInteger.TWO) == BigInteger.ZERO) return false
-        return n.isProbablePrime(20)
+    private val PRIMES_UP_TO_5000 = listOf(
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113,
+        127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 
+        257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 
+        401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547, 557, 
+        563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701, 
+        709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797, 809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 
+        877, 881, 883, 887, 907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997
+    ).map { BigInteger.valueOf(it.toLong()) }
+
+    private val A1_MATRIX = arrayOf(
+        doubleArrayOf(7.0, 286.0, 200.0, 176.0, 120.0, 165.0),
+        doubleArrayOf(206.0, 75.0, 129.0, 109.0, 123.0, 111.0),
+        doubleArrayOf(43.0, 52.0, 99.0, 128.0, 111.0, 110.0),
+        doubleArrayOf(98.0, 135.0, 112.0, 78.0, 118.0, 64.0),
+        doubleArrayOf(77.0, 227.0, 93.0, 88.0, 69.0, 60.0),
+        doubleArrayOf(34.0, 30.0, 73.0, 54.0, 45.0, 83.0),
+        doubleArrayOf(182.0, 88.0, 75.0, 85.0, 54.0, 53.0),
+        doubleArrayOf(89.0, 59.0, 37.0, 35.0, 38.0, 29.0),
+        doubleArrayOf(18.0, 45.0, 60.0, 49.0, 62.0, 55.0),
+        doubleArrayOf(78.0, 96.0, 29.0, 22.0, 24.0, 13.0),
+        doubleArrayOf(14.0, 11.0, 11.0, 18.0, 12.0, 12.0),
+        doubleArrayOf(30.0, 52.0, 52.0, 44.0, 28.0, 28.0),
+        doubleArrayOf(20.0, 56.0, 40.0, 31.0, 50.0, 40.0),
+        doubleArrayOf(46.0, 42.0, 29.0, 19.0, 36.0, 25.0),
+        doubleArrayOf(22.0, 17.0, 19.0, 26.0, 30.0, 20.0),
+        doubleArrayOf(15.0, 21.0, 11.0, 8.0, 8.0, 19.0),
+        doubleArrayOf(5.0, 8.0, 8.0, 11.0, 11.0, 8.0),
+        doubleArrayOf(3.0, 9.0, 5.0, 4.0, 7.0, 3.0),
+        doubleArrayOf(6.0, 3.0, 5.0, 4.0, 5.0, 6.0)
+    )
+
+    private fun approximatePrime(i: Int): Int {
+        if (i < 1) return 2
+        if (i <= 2) return i + 1
+        val iDouble = i.toDouble()
+        return (iDouble * (Math.log(iDouble) + Math.log(Math.log(iDouble)) - 1.0)).toInt()
     }
 
-    fun extractPrimeBounds(n: BigInteger): List<BigInteger> {
-        val sN = DoubleArray(19) { i ->
-            val q = BigInteger.valueOf(Q_PRIMES[i].toLong())
-            n.remainder(q).toDouble()
-        }
-
-        val spectralCoords = DoubleArray(6)
-
-        for (i in 0 until 6) {
-            var sum = 0.0
-            for (j in 0 until 19) {
-                sum += A1_PINV[i][j] * sN[j]
-            }
-            spectralCoords[i] = sum
-        }
-
-        val primeFactors = mutableSetOf<BigInteger>()
+    private fun buildDynamicMatrix(N: BigInteger, center: Double? = null, beta: Double = 0.5): Pair<Array2DRowRealMatrix, List<Double>> {
+        val nDouble = N.toDouble()
+        val lnN = Math.log(nDouble.coerceAtLeast(Math.E))
+        val M = Math.max(20, (lnN * lnN).toInt())
+        val K = Math.max(6, (Math.log(nDouble) / Math.log(2.0)).toInt())
+        val A_N = Array(M) { DoubleArray(K) }
         
-        for (i in 0 until 6) {
-            val unrounded = Math.abs(spectralCoords[i] * LAMBDA_MAX)
-            val k = Math.round(unrounded)
-            if (k > 1L) {
-                val kBig = BigInteger.valueOf(k)
-                val gcd = n.gcd(kBig)
-                if (gcd > BigInteger.ONE) {
-                    primeFactors.add(gcd)
+        val Q = if (center == null) {
+            val step = Math.sqrt(nDouble) / (lnN * lnN)
+            List(M) { i -> (i + 1) * step }
+        } else {
+            val halfRange = beta * lnN
+            List(M) { i -> center - halfRange + (i + 1) * (2 * halfRange) / M }
+        }
+        
+        for (i in 0 until M) {
+            val Pi = Q[i]
+            for (j in 0 until K) {
+                val d = exp(-(i * j) / (lnN * lnN))
+                A_N[i][j] = floor(sigmaBase[j % 6] * Pi * lnN * d)
+            }
+        }
+        return Pair(Array2DRowRealMatrix(A_N), Q)
+    }
+
+    private fun getExponent(n: BigInteger, p: BigInteger): Int {
+        var num = n
+        var k = 0
+        while (num > BigInteger.ONE && num.remainder(p) == BigInteger.ZERO) {
+            num = num.divide(p)
+            k++
+        }
+        return k
+    }
+
+    fun spectralAnalyzer(N: BigInteger, onFactorFound: (BigInteger) -> Unit) {
+        val factors = mutableMapOf<BigInteger, Int>()
+        
+        fun decompose(nVar: BigInteger) {
+            if (nVar <= BigInteger.ONE) return
+            
+            // 1. Trial division fallback
+            var tempN = nVar
+            for (p in PRIMES_UP_TO_5000) {
+                if (p.multiply(p) > tempN) break
+                while (tempN.remainder(p) == BigInteger.ZERO) {
+                    onFactorFound(p)
+                    tempN = tempN.divide(p)
+                }
+            }
+            if (tempN == BigInteger.ONE) return
+            if (millerRabin(tempN)) {
+                onFactorFound(tempN)
+                return
+            }
+
+            // 2. Try Spectral Method
+            val maxIter = 5
+            var iteration = 0
+            var found = false
+            var prevQ: List<Double>? = null
+            var prevZ: DoubleArray? = null
+            
+            var currentN = tempN
+            val lnN = Math.log(currentN.toDouble().coerceAtLeast(Math.E))
+            
+            while (iteration < maxIter && !found) {
+                iteration++
+                
+                val center = if (iteration > 1 && prevQ != null && prevZ != null) {
+                    val numerator = prevQ!!.zip(prevZ!!.asIterable()).sumOf { (q, z) -> q * z }
+                    val denominator = prevZ!!.sum()
+                    if (abs(denominator) > 1e-9) numerator / denominator else null
+                } else null
+                
+                val (aN, Q) = buildDynamicMatrix(currentN, center = center)
+                
+                val svd = SingularValueDecomposition(aN)
+                val U = svd.u
+                val Sigma = svd.singularValues
+                val K = aN.columnDimension
+                val M = aN.rowDimension
+                
+                val tau = Math.sqrt(currentN.toDouble()) / lnN
+                
+                val sN = DoubleArray(M)
+                for (i in 0 until M) {
+                    sN[i] = currentN.remainder(BigInteger.valueOf(Q[i].toLong().coerceAtLeast(2L))).toDouble()
+                }
+                val snVector = ArrayRealVector(sN)
+                
+                val sigmaInv = DoubleArray(Sigma.size) { i ->
+                    if (Sigma[i] > 1e-5) 1.0 / Sigma[i] else 0.0
+                }
+                val uT_SN = U.transpose().operate(snVector)
+                val z = DoubleArray(Sigma.size) { i -> sigmaInv[i] * uT_SN.getEntry(i) }
+                
+                for (j in 0 until K) {
+                    if (abs(z[j]) >= tau) {
+                        val aN_pinv = svd.solver.inverse
+                        val pRaw = aN_pinv.operate(snVector)
+                        val kDouble = abs(pRaw.getEntry(j) * (if (j < Sigma.size) Sigma[j] else 0.0) * lnN)
+                        if (kDouble > 1.0) {
+                            val kjBig = BigInteger.valueOf(kDouble.toLong())
+                            val p = currentN.gcd(kjBig)
+                            if (p > BigInteger.ONE && p < currentN) {
+                                decompose(p)
+                                decompose(currentN.divide(p))
+                                found = true
+                                break
+                            }
+                        }
+                    }
+                }
+                prevQ = Q
+                prevZ = z
+            }
+            
+            // 3. Neighborhood Sieving (if still not found)
+            if (!found) {
+                val delta = solveExactDelta(currentN)
+                val pApprox = Math.sqrt(currentN.toDouble()) * Math.exp(-delta)
+                val range = lnN * 2.0 // Small search range
+                val start = (pApprox - range).toLong().coerceAtLeast(2L)
+                val end = (pApprox + range).toLong()
+                
+                for (p in start..end) {
+                    if (p % 2L == 0L && p != 2L) continue
+                    val pBig = BigInteger.valueOf(p)
+                    if (pBig > BigInteger.ONE && pBig < currentN && currentN.remainder(pBig) == BigInteger.ZERO) {
+                        decompose(pBig)
+                        decompose(currentN.divide(pBig))
+                        found = true
+                        break
+                    }
+                }
+            }
+            
+            // 4. Final Fallback (Robust)
+            if (!found) {
+                if (millerRabin(currentN)) {
+                    onFactorFound(currentN)
+                } else {
+                    // Try Pollard's Rho, guided by spectral hint
+                    val hint: BigInteger? = run {
+                        val delta = solveExactDelta(currentN)
+                        val pApprox = Math.sqrt(currentN.toDouble()) * Math.exp(-delta)
+                        BigInteger.valueOf(pApprox.toLong())
+                    }
+                    
+                    val factor = pollardRho(currentN, hint = hint)
+                    if (factor != currentN && factor > BigInteger.ONE) {
+                        decompose(factor)
+                        decompose(currentN.divide(factor))
+                    } else {
+                        // If all fails, report as is
+                        onFactorFound(currentN)
+                    }
                 }
             }
         }
-        return primeFactors.toList()
+        
+        decompose(N)
+    }
+
+    private fun solveExactDelta(n: BigInteger): Double {
+        val sqrtN = Math.sqrt(n.toDouble())
+        val W = A1_MATRIX.flatMap { it.asIterable() }.toDoubleArray()
+        
+        fun f(delta: Double): Double {
+            val qGuess = sqrtN * Math.exp(delta)
+            var sineSum = 0.0
+            for (k in W.indices) {
+                val phase = ((k + 1) * qGuess) % 1.0
+                sineSum += W[k] * Math.sin(2 * Math.PI * phase)
+            }
+            return sineSum
+        }
+        
+        var bestDelta = 0.0
+        var minVal = Double.MAX_VALUE
+        val steps = 1000
+        for (i in 0..steps) {
+            val delta = 0.01 + (i.toDouble() / steps) * 1.99
+            val v = Math.abs(f(delta))
+            if (v < minVal) {
+                minVal = v
+                bestDelta = delta
+            }
+        }
+        return bestDelta
+    }
+
+
+    fun isPrime(n: BigInteger): Boolean {
+        // Spectral resonance pre-check
+        for (prime in BASE_PRIMES) {
+            if (n == prime) return true
+            if (n.remainder(prime) == BigInteger.ZERO) return false
+        }
+        // Miller-Rabin for higher certainty
+        return millerRabin(n)
+    }
+
+    fun millerRabin(n: BigInteger, k: Int = 40): Boolean {
+        if (n <= BigInteger.ONE) return false
+        if (n == TWO || n == BigInteger.valueOf(3)) return true
+        if (n.remainder(TWO) == BigInteger.ZERO) return false
+        
+        var d = n.subtract(BigInteger.ONE)
+        var s = 0
+        while (d.remainder(TWO) == BigInteger.ZERO) {
+            d = d.divide(TWO)
+            s++
+        }
+        
+        val random = SecureRandom()
+        repeat(k) {
+            val a = TWO.add(BigInteger(n.bitLength() - 3, random).remainder(n.subtract(BigInteger.valueOf(4))))
+            var x = a.modPow(d, n)
+            if (x == BigInteger.ONE || x == n.subtract(BigInteger.ONE)) return@repeat
+            
+            var composite = true
+            repeat(s - 1) {
+                x = x.modPow(TWO, n)
+                if (x == n.subtract(BigInteger.ONE)) {
+                    composite = false
+                    return@repeat
+                }
+            }
+            if (composite) return false
+        }
+        return true
+    }
+
+    private fun pollardRho(n: BigInteger, hint: BigInteger? = null): BigInteger {
+        if (n == TWO) return TWO
+        if (millerRabin(n)) return n
+        
+        var x = hint ?: BigInteger("2")
+        var y = hint ?: BigInteger("2")
+        var d = BigInteger.ONE
+        var c = BigInteger.ONE
+        val random = SecureRandom()
+        
+        while (d == BigInteger.ONE) {
+            x = (x.multiply(x).add(c)).remainder(n)
+            y = (y.multiply(y).add(c)).remainder(n)
+            y = (y.multiply(y).add(c)).remainder(n)
+            d = (x.subtract(y)).abs().gcd(n)
+            if (d == n) {
+                // Failure: Retry with different c
+                x = BigInteger(n.bitLength(), random).remainder(n)
+                y = x
+                c = c.add(BigInteger.ONE)
+                d = BigInteger.ONE
+            }
+        }
+        return d
     }
 
     fun factorize(n: BigInteger): Map<BigInteger, Int> {
         val factors = mutableMapOf<BigInteger, Int>()
-        var current = n
-        if (current <= BigInteger.ONE) return factors
-
-        // Spectral GCD Extraction
-        val extractedPrimes = extractPrimeBounds(n).sorted()
-
-        // Factorize based strictly on extracted bounds
-        for (p in extractedPrimes) {
-            var count = 0
-            while (current.remainder(p) == BigInteger.ZERO) {
-                count++
-                current = current.divide(p)
-            }
-            if (count > 0) factors[p] = count
+        spectralAnalyzer(n) { factor ->
+            factors[factor] = (factors[factor] ?: 0) + 1
         }
-        
-        // Retain standard trailing prime just in case, per robust number theory practice
-        if (current > BigInteger.ONE) {
-            factors[current] = 1
-        }
-
         return factors
     }
 
-    // W(p) = ((p-1)! + 1) mod p
-    // For small p this is fast. For large p, it's slow. We will do a loop up to p-1.
-    // If p is larger than 100,000, we might want to return 0 or mock it to avoid freezing.
-    fun wilson(p: BigInteger): BigInteger {
-        if (!isPrime(p)) return BigInteger.valueOf(-1) // Error case
-        if (p > BigInteger.valueOf(100000)) return BigInteger.ZERO // Timeout prevention, since it's just for demo. But we can do it up to 100,000
-
-        var factMod = BigInteger.ONE
-        var i = BigInteger.TWO
-        val pMinusOne = p.subtract(BigInteger.ONE)
-        while (i <= pMinusOne) {
-            factMod = factMod.multiply(i).remainder(p)
-            i = i.add(BigInteger.ONE)
-        }
-        return factMod.add(BigInteger.ONE).remainder(p)
-    }
-
-    // Phi = |N - product(p_i^{a_i})| + sum_{distinct p_i} W(p_i)
     fun calculatePhi(n: BigInteger, factors: Map<BigInteger, Int>): BigInteger {
-        var product = BigInteger.ONE
-        var wilsonSum = BigInteger.ZERO
-
-        for ((p, a) in factors) {
-            product = product.multiply(p.pow(a))
-            wilsonSum = wilsonSum.add(wilson(p))
+        if (n <= BigInteger.ZERO) return BigInteger.ZERO
+        if (n == BigInteger.ONE) return BigInteger.ONE
+        var result = n
+        for ((p, _) in factors) {
+            result = result.divide(p).multiply(p.subtract(BigInteger.ONE))
         }
-
-        return n.subtract(product).abs().add(wilsonSum)
-    }
-    
-    fun eulerTotient(n: BigInteger, factors: Map<BigInteger, Int>): BigInteger {
-        var phi = n
-        for (p in factors.keys) {
-            phi = phi.multiply(p.subtract(BigInteger.ONE)).divide(p)
-        }
-        return phi
+        return result
     }
 
-    fun mobius(factors: Map<BigInteger, Int>): Int {
-        if (factors.isEmpty()) return 1
-        for (a in factors.values) {
-            if (a > 1) return 0
+    fun wilsonSum(n: BigInteger): BigInteger {
+        if (n <= BigInteger.ONE) return BigInteger.ZERO
+        if (n > BigInteger.valueOf(5000)) return BigInteger.valueOf(-1) 
+        
+        var fact = BigInteger.ONE
+        for (i in 2 until n.toInt()) {
+            fact = fact.multiply(BigInteger.valueOf(i.toLong())).remainder(n)
         }
-        return if (factors.size % 2 == 0) 1 else -1
-    }
-    
-    fun omegaSmall(factors: Map<BigInteger, Int>): Int = factors.size
-    fun omegaLarge(factors: Map<BigInteger, Int>): Int = factors.values.sum()
-    
-    fun divisorsCount(factors: Map<BigInteger, Int>): BigInteger {
-        var count = BigInteger.ONE
-        for (a in factors.values) {
-            count = count.multiply(BigInteger.valueOf((a + 1).toLong()))
-        }
-        return count
+        return fact.add(BigInteger.ONE).remainder(n)
     }
 }
