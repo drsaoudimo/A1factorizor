@@ -1,0 +1,26 @@
+package com.example.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val BgColor = Color(0xFFF7F9FF)
+val CardBgColor = Color(0xFFFFFFFF)
+val Slate100 = Color(0xFFF1F5F9)
+val Slate300 = Color(0xFFCBD5E1)
+val Slate400 = Color(0xFF94A3B8)
+val Slate500 = Color(0xFF64748B)
+val Slate600 = Color(0xFF475569)
+val Slate700 = Color(0xFF334155)
+val Slate800 = Color(0xFF1E293B)
+val Slate900 = Color(0xFF0F172A)
+val InputBgColor = Color(0xFFD3E4FF)
+val Blue100 = Color(0xFFDBEAFE)
+val Blue200 = Color(0xFFBFDBFE)
+val Blue600 = Color(0xFF2563EB)
+val Blue700 = Color(0xFF1D4ED8)
+val Blue800 = Color(0xFF1E40AF)
+val Cyan400 = Color(0xFF22D3EE)
+val Green100 = Color(0xFFDCFCE7)
+val Green200 = Color(0xFFBBF7D0)
+val Green500 = Color(0xFF22C55E)
+val Green700 = Color(0xFF15803D)
+val ErrorRed = Color(0xFFEF4444)
