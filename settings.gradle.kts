@@ -12,6 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-rootProject.name = "PrimeAnalyzer"
+rootProject.name = "Prime Analyzer"
 include(":app")
